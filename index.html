@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ultra BaaSiC — Team Management (POC)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base:#160F29;--bg-raised:#1C1535;--bg-elevated:#231C43;
+      --border-subtle:rgba(255,255,255,0.06);--border-default:rgba(255,255,255,0.10);
+      --primary-cta:#4D4DFF;--primary-soft:rgba(65,63,207,0.16);--primary-border:rgba(77,77,255,0.26);
+      --primary-fg:#C2C2FF;--primary-icon:#7070FF;
+      --aqua:#0DFDE1;--aqua-soft:rgba(13,253,225,0.10);
+      --urgent:#F79009;--urgent-soft:rgba(247,144,9,0.09);--urgent-border:rgba(247,144,9,0.22);
+      --urgent-fg:#FDB022;--urgent-light:#FEC84B;
+      --success:#12B76A;--success-soft:rgba(18,183,106,0.10);--success-fg:#32D583;
+      --danger:#F04438;--danger-soft:rgba(240,68,56,0.10);--danger-border:rgba(240,68,56,0.22);--danger-fg:#F97066;
+      --violet-soft:rgba(139,92,246,0.12);--violet-fg:#A78BFA;--violet-border:rgba(139,92,246,0.22);
+      --cyan-soft:rgba(6,182,212,0.10);--cyan-fg:#22D3EE;
+      --amber-soft:rgba(245,158,11,0.10);--amber-fg:#FCD34D;
+      --fg-strong:#FFFFFF;--fg-default:rgba(255,255,255,0.82);
+      --fg-muted:rgba(255,255,255,0.50);--fg-subtle:rgba(255,255,255,0.28);
+      --font:"Montserrat","Inter",system-ui,sans-serif;
+      --font-mono:"Consolas","IBM Plex Mono",monospace;
+      --r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-pill:9999px;
+      --ease:cubic-bezier(0.2,0,0.2,1);--dur:150ms;
+      --bg-sidebar:var(--bg-base);--header-bg:rgba(22,15,41,0.92);
+    }
+    [data-theme="light"] {
+      --bg-base:#F4F5FA;--bg-raised:#FFFFFF;--bg-elevated:#EFF1F5;
+      --border-subtle:#EAECF0;--border-default:#DCDFEA;
+      --primary-soft:rgba(77,77,255,0.08);--primary-border:rgba(65,63,207,0.20);
+      --primary-fg:#3531A0;--primary-icon:#413FCF;
+      --aqua:#02CAB3;--aqua-soft:rgba(2,202,179,0.10);
+      --urgent-soft:rgba(247,144,9,0.07);--urgent-border:rgba(220,104,3,0.22);
+      --urgent-fg:#DC6803;--urgent-light:#B54708;
+      --success-fg:#039855;--success-soft:rgba(3,152,85,0.08);
+      --danger-soft:rgba(217,45,32,0.08);--danger-border:rgba(217,45,32,0.18);--danger-fg:#D92D20;
+      --violet-soft:rgba(109,40,217,0.08);--violet-fg:#5B21B6;--violet-border:rgba(109,40,217,0.18);
+      --cyan-soft:rgba(14,116,144,0.08);--cyan-fg:#0E7490;
+      --amber-soft:rgba(180,83,9,0.08);--amber-fg:#B45309;
+      --fg-strong:#110022;--fg-default:#30374F;--fg-muted:#5D6B98;--fg-subtle:#9EA5BE;
+      --bg-sidebar:#FFFFFF;--header-bg:rgba(255,255,255,0.92);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg-base);color:var(--fg-default);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+    a{text-decoration:none;color:inherit}
+    button{cursor:pointer;font-family:var(--font);border:none;background:none}
+
+    /* Layout */
+    .layout{display:flex;min-height:100vh}
+    .sidebar{width:248px;flex-shrink:0;background:var(--bg-sidebar);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;position:fixed;top:0;bottom:0}
+    .sidebar-header{height:57px;padding:0 12px 0 14px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between}
+    .logo-wordmark{display:flex;align-items:center;gap:10px;color:var(--fg-strong)}
+    .logo-brand{font-size:20px;font-weight:700;letter-spacing:-0.03em}
+    .logo-product{font-size:10px;font-weight:600;letter-spacing:0.02em;margin-top:3px}
+    .logo-product em{font-style:normal;color:var(--primary-fg)}
+    .logo-product span{color:var(--fg-muted)}
+    .sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--fg-muted);cursor:pointer;transition:color var(--dur) var(--ease),background var(--dur) var(--ease)}
+    .nav-item:hover{color:var(--fg-default);background:rgba(255,255,255,0.05)}
+    .nav-item.active{color:#9393FF;background:rgba(77,77,255,0.15);border:1px solid rgba(77,77,255,0.2)}
+    .nav-group{padding:10px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-subtle)}
+    .nav-divider{height:1px;background:var(--border-subtle);margin:6px 2px}
+    .sidebar-footer{flex-shrink:0;padding:6px 8px;border-top:1px solid var(--border-subtle)}
+    .sidebar-user{margin:6px;padding:8px 10px;border:1px solid var(--border-subtle);border-radius:var(--r-lg);display:flex;align-items:center;gap:10px}
+    .u-avatar{width:28px;height:28px;border-radius:var(--r-pill);background:var(--primary-soft);border:1px solid var(--primary-border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--primary-fg);flex-shrink:0}
+    .u-info{flex:1;min-width:0}
+    .u-name{font-size:12px;font-weight:600;color:var(--fg-default)}
+    .u-role{font-size:10px;color:var(--fg-subtle);margin-top:1px}
+    .u-dot{width:6px;height:6px;border-radius:50%;background:var(--aqua)}
+
+    /* Main */
+    .main{margin-left:248px;flex:1;display:flex;flex-direction:column}
+    .header{height:57px;border-bottom:1px solid var(--border-subtle);background:var(--header-bg);backdrop-filter:blur(8px);display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:10;gap:8px}
+    .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-muted)}
+    .breadcrumb a:hover{color:var(--fg-default)}
+    .bc-sep{color:var(--fg-subtle)}
+    .bc-cur{color:var(--fg-default);font-weight:600}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .h-divider{width:1px;height:18px;background:var(--border-subtle)}
+    .badge-role{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--r-pill);border:1px solid var(--urgent-border);background:var(--urgent-soft);color:var(--urgent-light)}
+    .btn-icon{width:30px;height:30px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--fg-muted);transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
+    .btn-icon:hover{background:rgba(255,255,255,0.06);color:var(--fg-default)}
+
+    /* Content */
+    .content{padding:24px;display:flex;flex-direction:column;gap:20px}
+
+    /* Partner hero */
+    .partner-hero{background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:18px 22px;display:flex;align-items:center;gap:16px}
+    .p-avatar{width:46px;height:46px;border-radius:var(--r-lg);background:var(--primary-soft);border:1px solid var(--primary-border);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--primary-fg);flex-shrink:0}
+    .p-details{flex:1}
+    .p-name{font-size:17px;font-weight:700;color:var(--fg-strong)}
+    .p-meta{display:flex;align-items:center;gap:7px;margin-top:6px;flex-wrap:wrap}
+    .status-active{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--success-fg);font-weight:600}
+    .status-active::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success);display:block}
+    .mod-chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--r-pill)}
+    .mc-pay{background:var(--primary-soft);color:var(--primary-fg);border:1px solid var(--primary-border)}
+    .mc-otc{background:var(--amber-soft);color:var(--amber-fg);border:1px solid rgba(245,158,11,0.22)}
+    .mc-qfc{background:var(--violet-soft);color:var(--violet-fg);border:1px solid var(--violet-border)}
+
+    /* Buttons */
+    .btn-primary{background:var(--primary-cta);color:#fff;border-radius:var(--r-md);padding:7px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;border:none;cursor:pointer;font-family:var(--font);transition:filter var(--dur) var(--ease)}
+    .btn-primary:hover{filter:brightness(1.12)}
+    .btn-secondary{background:rgba(255,255,255,0.07);color:var(--fg-default);border-radius:var(--r-md);padding:7px 14px;font-size:12px;font-weight:600;border:1px solid var(--border-default);font-family:var(--font);cursor:pointer;transition:background var(--dur) var(--ease)}
+    .btn-secondary:hover{background:rgba(255,255,255,0.11)}
+
+    /* Tabs */
+    .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-subtle)}
+    .tab-btn{padding:10px 14px;font-size:13px;font-weight:500;color:var(--fg-muted);border-bottom:2px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);transition:color var(--dur) var(--ease);margin-bottom:-1px}
+    .tab-btn:hover{color:var(--fg-default)}
+    .tab-btn.active{color:var(--primary-fg);border-bottom-color:var(--primary-cta)}
+
+    /* Section */
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .section-title{font-size:13px;font-weight:600;color:var(--fg-default)}
+    .section-count{font-size:12px;color:var(--fg-muted);margin-left:6px}
+
+    /* Table */
+    .table-wrap{background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:var(--r-xl);overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead th{text-align:left;padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--fg-subtle);border-bottom:1px solid var(--border-subtle);white-space:nowrap}
+    tbody td{padding:12px 16px;border-bottom:1px solid var(--border-subtle);font-size:13px}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:rgba(255,255,255,0.02)}
+    .user-cell{display:flex;align-items:center;gap:10px}
+    .uc-av{width:30px;height:30px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+    .uc-name{font-size:13px;font-weight:600;color:var(--fg-default)}
+    .uc-email{font-size:11px;color:var(--fg-subtle);margin-top:2px}
+
+    /* Profile badges */
+    .pb{font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--r-pill);white-space:nowrap}
+    .pb-admin  {background:var(--primary-soft);color:var(--primary-fg);border:1px solid var(--primary-border)}
+    .pb-finance{background:var(--success-soft);color:var(--success-fg);border:1px solid rgba(18,183,106,0.22)}
+    .pb-trader {background:var(--amber-soft);color:var(--amber-fg);border:1px solid rgba(245,158,11,0.22)}
+    .pb-support{background:var(--cyan-soft);color:var(--cyan-fg);border:1px solid rgba(6,182,212,0.22)}
+    .pb-viewer {background:rgba(255,255,255,0.06);color:var(--fg-muted);border:1px solid var(--border-default)}
+    .pb-custom {background:var(--violet-soft);color:var(--violet-fg);border:1px solid var(--violet-border)}
+
+    .sb{font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--r-pill)}
+    .sb-active {background:var(--success-soft);color:var(--success-fg)}
+    .sb-invited{background:var(--urgent-soft);color:var(--urgent-fg)}
+
+    .row-actions{display:flex;align-items:center;gap:4px;opacity:0;transition:opacity var(--dur) var(--ease)}
+    tbody tr:hover .row-actions{opacity:1}
+    .btn-row{width:28px;height:28px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--fg-muted);background:none;transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
+    .btn-row:hover{background:rgba(255,255,255,0.07);color:var(--fg-default)}
+    .btn-row.danger:hover{background:var(--danger-soft);color:var(--danger-fg)}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(10,5,20,0.75);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 200ms var(--ease)}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--bg-raised);border:1px solid var(--border-default);border-radius:16px;width:740px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);display:flex;flex-direction:column;transform:translateY(14px) scale(0.98);transition:transform 200ms var(--ease);box-shadow:0 24px 64px rgba(0,0,0,0.55)}
+    .modal-overlay.open .modal{transform:translateY(0) scale(1)}
+    .modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+    .modal-title{font-size:16px;font-weight:700;color:var(--fg-strong)}
+    .modal-subtitle{font-size:12px;color:var(--fg-muted);margin-top:3px}
+    .btn-close{width:28px;height:28px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--fg-muted);background:none;transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
+    .btn-close:hover{background:rgba(255,255,255,0.07);color:var(--fg-default)}
+    .modal-body{padding:20px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;flex:1}
+    .modal-footer{padding:14px 22px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .modal-footer-right{display:flex;align-items:center;gap:8px}
+
+    /* Form */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-subtle);margin-bottom:6px}
+    .form-input{width:100%;background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--r-md);padding:9px 12px;font-size:13px;color:var(--fg-default);font-family:var(--font);outline:none;transition:border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+    .form-input:focus{border-color:var(--primary-cta);box-shadow:0 0 0 3px rgba(77,77,255,0.18)}
+    .form-input::placeholder{color:var(--fg-subtle)}
+
+    /* Profile selector */
+    .field-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-subtle);margin-bottom:8px}
+    .profile-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+    .profile-card{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all var(--dur) var(--ease);text-align:center}
+    .profile-card:hover{border-color:var(--border-default);background:rgba(255,255,255,0.05)}
+    .profile-card.selected{border-color:var(--primary-cta);background:var(--primary-soft);box-shadow:0 0 0 1px var(--primary-cta)}
+    .pc-icon{width:32px;height:32px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center}
+    .pc-name{font-size:11px;font-weight:700;color:var(--fg-default)}
+    .pc-desc{font-size:10px;color:var(--fg-subtle);line-height:1.3}
+    .preset-summary{font-size:11px;color:var(--fg-muted);margin-top:5px;min-height:16px;transition:color var(--dur) var(--ease)}
+    .preset-summary.custom{color:var(--violet-fg)}
+
+    /* Permission grid */
+    .perm-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden}
+    .perm-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background var(--dur) var(--ease)}
+    .perm-item:hover{background:rgba(255,255,255,0.03)}
+    .perm-item:nth-child(odd){border-right:1px solid var(--border-subtle)}
+    .perm-item:nth-last-child(1),.perm-item:nth-last-child(2){border-bottom:none}
+    .perm-item.locked{opacity:0.45;cursor:not-allowed;pointer-events:none}
+    .perm-toggle{width:16px;height:16px;border-radius:4px;border:2px solid var(--border-default);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--dur) var(--ease)}
+    .perm-toggle.on{background:var(--primary-cta);border-color:var(--primary-cta)}
+    .perm-toggle.on::after{content:'';width:8px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translate(1px,-1px);display:block}
+    .perm-name{font-size:12px;font-weight:500;color:var(--fg-default)}
+    .perm-key{font-size:10px;color:var(--fg-subtle);font-family:var(--font-mono);margin-top:1px}
+    .perm-note{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--urgent-soft);color:var(--urgent-fg);flex-shrink:0;white-space:nowrap}
+    .perm-module-header{grid-column:1/-1;padding:8px 12px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-subtle);border-bottom:1px solid var(--border-subtle);background:var(--bg-base)}
+
+    /* Modal note */
+    .modal-note{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;background:var(--primary-soft);border:1px solid var(--primary-border);border-radius:var(--r-lg);font-size:12px;color:var(--primary-fg);line-height:1.5}
+    .modal-note svg{flex-shrink:0;margin-top:1px}
+
+    /* Row save flash */
+    @keyframes row-save-flash{0%{background:rgba(18,183,106,0.14)}100%{background:transparent}}
+    .row-saved td{animation:row-save-flash 0.9s var(--ease) forwards}
+
+    /* Theme toggle */
+    [data-theme="light"] .nav-item.active{color:var(--primary-cta);background:rgba(77,77,255,0.07);border-color:rgba(77,77,255,0.15)}
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-wordmark">
+        <svg width="36" height="24" viewBox="0 0 43 29" fill="none">
+          <path d="M21.5 0H7.16667L21.5 14.5H35.8333L21.5 0Z" fill="url(#mg)"/>
+          <path d="M7.16667 0L14.3333 7.25L7.16667 14.5L0 7.25L7.16667 0Z" fill="currentColor"/>
+          <path d="M35.8333 0L43 7.25L35.8333 14.5L28.6667 7.25L35.8333 0Z" fill="currentColor"/>
+          <path d="M21.5 14.5L28.6667 21.75L21.5 29L14.3333 21.75L21.5 14.5Z" fill="currentColor"/>
+          <defs><linearGradient id="mg" x1="7.16667" y1="0" x2="35" y2="14.5" gradientUnits="userSpaceOnUse"><stop stop-color="#7EF6EF"/><stop offset="0.505" stop-color="#3F3FF9"/><stop offset="1" stop-color="#1A0E38"/></linearGradient></defs>
+        </svg>
+        <div>
+          <div class="logo-brand">Transfero</div>
+          <div class="logo-product"><em>Ultra</em> <span>BaaSiC</span></div>
+        </div>
+      </div>
+      <button class="btn-icon" id="theme-btn" title="Toggle theme"></button>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        Overview
+      </a>
+      <div class="nav-group">Organization</div>
+      <a class="nav-item active" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h8"/><path d="M4 18h8"/><path d="M14 15a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M20 21v-2a2 2 0 0 0-4 0v2"/></svg>
+        Modules
+      </a>
+      <div class="nav-divider"></div>
+      <div class="nav-group">Operations</div>
+      <a class="nav-item" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+        Transactions
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        OTC / QFC
+      </a>
+      <div class="nav-divider"></div>
+      <div class="nav-group">Settings</div>
+      <a class="nav-item" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        API Keys
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+        Audit Log
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg>
+        Support
+      </a>
+    </div>
+    <div class="sidebar-user">
+      <div class="u-avatar" style="background:var(--success-soft);border-color:rgba(18,183,106,0.22);color:var(--success-fg)">JS</div>
+      <div class="u-info"><div class="u-name">João Silva</div><div class="u-role">Owner · XYZ Payments</div></div>
+      <div class="u-dot"></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="header">
+      <div class="breadcrumb">
+        <a href="#">XYZ Payments Ltda</a>
+        <span class="bc-sep">/</span>
+        <a href="#">Organization</a>
+        <span class="bc-sep">/</span>
+        <span class="bc-cur">Team</span>
+      </div>
+      <div class="header-right">
+        <div class="h-divider"></div>
+        <span class="badge-role">Owner</span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Partner hero -->
+      <div class="partner-hero">
+        <div class="p-avatar">XP</div>
+        <div class="p-details">
+          <div class="p-name">XYZ Payments Ltda</div>
+          <div class="p-meta">
+            <span class="status-active">Active</span>
+            <span class="mod-chip mc-pay">Payments</span>
+            <span class="mod-chip mc-otc">OTC</span>
+            <span class="mod-chip mc-qfc">QFC</span>
+          </div>
+        </div>
+        <button class="btn-secondary" style="display:flex;align-items:center;gap:6px;font-size:12px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Configure Modules
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div>
+        <div class="tabs">
+          <button class="tab-btn">Overview</button>
+          <button class="tab-btn active">Users</button>
+          <button class="tab-btn">Modules</button>
+          <button class="tab-btn">API Keys</button>
+          <button class="tab-btn">Audit Log</button>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div>
+        <div class="section-header">
+          <div>
+            <span class="section-title">Team Members</span>
+            <span class="section-count">5 users</span>
+          </div>
+          <button class="btn-primary" onclick="openModal()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11v6m-3-3h6"/></svg>
+            Invite User
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Profile</th>
+                <th>Permissions</th>
+                <th>Modules</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="user-row-0">
+                <td><div class="user-cell"><div class="uc-av" style="background:var(--primary-soft);border:1px solid var(--primary-border);color:var(--primary-fg);">JS</div><div><div class="uc-name">João Silva</div><div class="uc-email">joao@xyzpay.com</div></div></div></td>
+                <td><span class="pb pb-admin">Administrator</span></td>
+                <td><span style="font-size:12px;color:var(--fg-muted)"><strong style="color:var(--fg-default)">All</strong> permissions</span></td>
+                <td><span class="mod-chip mc-pay" style="font-size:10px;padding:2px 7px;">Pay</span> <span class="mod-chip mc-otc" style="font-size:10px;padding:2px 7px;">OTC</span> <span class="mod-chip mc-qfc" style="font-size:10px;padding:2px 7px;">QFC</span></td>
+                <td><span class="sb sb-active">Active</span></td>
+                <td><div class="row-actions"><button class="btn-row" title="Edit" onclick="editUser(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-row danger" title="Remove"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td>
+              </tr>
+              <tr id="user-row-1">
+                <td><div class="user-cell"><div class="uc-av" style="background:var(--success-soft);border:1px solid rgba(18,183,106,0.22);color:var(--success-fg);">MS</div><div><div class="uc-name">Maria Santos</div><div class="uc-email">maria@xyzpay.com</div></div></div></td>
+                <td><span class="pb pb-finance">Finance</span></td>
+                <td id="perm-cell-1"><span style="font-size:12px;color:var(--fg-muted)"><strong style="color:var(--fg-default)">7</strong> permissions</span></td>
+                <td><span class="mod-chip mc-pay" style="font-size:10px;padding:2px 7px;">Pay</span> <span class="mod-chip mc-otc" style="font-size:10px;padding:2px 7px;">OTC</span></td>
+                <td><span class="sb sb-active">Active</span></td>
+                <td><div class="row-actions"><button class="btn-row" title="Edit" onclick="editUser(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-row danger" title="Remove"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td>
+              </tr>
+              <tr id="user-row-2">
+                <td><div class="user-cell"><div class="uc-av" style="background:var(--amber-soft);border:1px solid rgba(245,158,11,0.22);color:var(--amber-fg);">CO</div><div><div class="uc-name">Carlos Oliveira</div><div class="uc-email">carlos@xyzpay.com</div></div></div></td>
+                <td><span class="pb pb-trader">Trader</span></td>
+                <td><span style="font-size:12px;color:var(--fg-muted)"><strong style="color:var(--fg-default)">3</strong> permissions</span></td>
+                <td><span class="mod-chip mc-otc" style="font-size:10px;padding:2px 7px;">OTC</span></td>
+                <td><span class="sb sb-active">Active</span></td>
+                <td><div class="row-actions"><button class="btn-row" title="Edit" onclick="editUser(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-row danger" title="Remove"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td>
+              </tr>
+              <tr id="user-row-3">
+                <td><div class="user-cell"><div class="uc-av" style="background:var(--cyan-soft);border:1px solid rgba(6,182,212,0.22);color:var(--cyan-fg);">AC</div><div><div class="uc-name">Ana Costa</div><div class="uc-email">ana@xyzpay.com</div></div></div></td>
+                <td><span class="pb pb-support">Support</span></td>
+                <td><span style="font-size:12px;color:var(--fg-muted)"><strong style="color:var(--fg-default)">3</strong> permissions</span></td>
+                <td><span class="mod-chip mc-pay" style="font-size:10px;padding:2px 7px;">Pay</span></td>
+                <td><span class="sb sb-invited">Invited</span></td>
+                <td><div class="row-actions"><button class="btn-row" title="Edit" onclick="editUser(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-row danger" title="Remove"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td>
+              </tr>
+              <tr id="user-row-4">
+                <td><div class="user-cell"><div class="uc-av" style="background:rgba(255,255,255,0.06);border:1px solid var(--border-default);color:var(--fg-muted);">PA</div><div><div class="uc-name">Pedro Alves</div><div class="uc-email">pedro@xyzpay.com</div></div></div></td>
+                <td><span class="pb pb-viewer">Viewer</span></td>
+                <td><span style="font-size:12px;color:var(--fg-muted)"><strong style="color:var(--fg-default)">2</strong> permissions</span></td>
+                <td><span class="mod-chip mc-pay" style="font-size:10px;padding:2px 7px;">Pay</span> <span class="mod-chip mc-otc" style="font-size:10px;padding:2px 7px;">OTC</span></td>
+                <td><span class="sb sb-active">Active</span></td>
+                <td><div class="row-actions"><button class="btn-row" title="Edit" onclick="editUser(4)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-row danger" title="Remove"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">Invite Team Member</div>
+        <div class="modal-subtitle" id="modal-subtitle">Pick a profile preset, then adjust permissions individually if needed.</div>
+      </div>
+      <button class="btn-close" onclick="closeModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Edit mode: user info banner -->
+      <div id="edit-user-info" style="display:none;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);">
+        <div id="edit-av" class="uc-av" style="width:36px;height:36px;font-size:13px;font-weight:700;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
+        <div>
+          <div id="edit-name" style="font-size:14px;font-weight:600;color:var(--fg-default);"></div>
+          <div id="edit-email" style="font-size:12px;color:var(--fg-subtle);margin-top:2px;"></div>
+        </div>
+        <div id="edit-cur-badge" style="margin-left:auto;"></div>
+      </div>
+
+      <!-- Name + Email (invite mode only) -->
+      <div class="form-row" id="invite-fields">
+        <div class="form-field">
+          <label>Name</label>
+          <input class="form-input" type="text" placeholder="Full name">
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input class="form-input" type="email" placeholder="user@company.com">
+        </div>
+      </div>
+
+      <!-- Profile selector -->
+      <div>
+        <div class="field-label">Profile Preset</div>
+        <div class="profile-selector">
+          <div class="profile-card" data-profile="administrator" onclick="selectProfile('administrator')">
+            <div class="pc-icon" style="background:var(--primary-soft);color:var(--primary-icon);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/><path d="m15.5 19.5 2 2 4-4"/></svg>
+            </div>
+            <div class="pc-name">Administrator</div>
+            <div class="pc-desc">Full access + user mgmt</div>
+          </div>
+          <div class="profile-card selected" data-profile="finance" onclick="selectProfile('finance')">
+            <div class="pc-icon" style="background:var(--success-soft);color:var(--success-fg);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            </div>
+            <div class="pc-name">Finance</div>
+            <div class="pc-desc">Financial ops, no user mgmt</div>
+          </div>
+          <div class="profile-card" data-profile="trader" onclick="selectProfile('trader')">
+            <div class="pc-icon" style="background:var(--amber-soft);color:var(--amber-fg);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21H17"/><path d="M12 3v18"/></svg>
+            </div>
+            <div class="pc-name">Trader</div>
+            <div class="pc-desc">OTC swap only</div>
+          </div>
+          <div class="profile-card" data-profile="support" onclick="selectProfile('support')">
+            <div class="pc-icon" style="background:var(--cyan-soft);color:var(--cyan-fg);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg>
+            </div>
+            <div class="pc-name">Support</div>
+            <div class="pc-desc">View + refund/cancel</div>
+          </div>
+          <div class="profile-card" data-profile="viewer" onclick="selectProfile('viewer')">
+            <div class="pc-icon" style="background:rgba(255,255,255,0.06);color:var(--fg-muted);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="pc-name">Viewer</div>
+            <div class="pc-desc">Read-only</div>
+          </div>
+        </div>
+        <div class="preset-summary" id="preset-summary">Finance preset: 7 permissions pre-selected.</div>
+      </div>
+
+      <!-- Permissions -->
+      <div>
+        <div class="field-label" style="display:flex;align-items:center;gap:8px;">
+          Permissions
+          <span class="mod-chip mc-pay" style="font-size:10px;padding:2px 7px;text-transform:none;letter-spacing:0">Payments</span>
+          <span class="mod-chip mc-otc" style="font-size:10px;padding:2px 7px;text-transform:none;letter-spacing:0">OTC</span>
+          <span class="mod-chip mc-qfc" style="font-size:10px;padding:2px 7px;text-transform:none;letter-spacing:0">QFC</span>
+        </div>
+        <div class="perm-grid">
+
+          <div class="perm-module-header">Payments (baas)</div>
+
+          <div class="perm-item" onclick="togglePerm('view_balance')">
+            <div class="perm-toggle on" id="t-view_balance"></div>
+            <div><div class="perm-name">View Balance</div><div class="perm-key">view_balance</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('view_history')">
+            <div class="perm-toggle on" id="t-view_history"></div>
+            <div><div class="perm-name">Transaction History</div><div class="perm-key">view_history</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('pix_deposit')">
+            <div class="perm-toggle on" id="t-pix_deposit"></div>
+            <div><div class="perm-name">PayIn (PIX / Crypto)</div><div class="perm-key">pix_deposit</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('pix_withdraw')">
+            <div class="perm-toggle on" id="t-pix_withdraw"></div>
+            <div><div class="perm-name">PayOut (PIX / Crypto)</div><div class="perm-key">pix_withdraw</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('crypto_withdraw')">
+            <div class="perm-toggle on" id="t-crypto_withdraw"></div>
+            <div><div class="perm-name">Crypto Withdraw</div><div class="perm-key">crypto_withdraw</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('txn_refund')">
+            <div class="perm-toggle" id="t-txn_refund"></div>
+            <div><div class="perm-name">Refund</div><div class="perm-key">txn_refund</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('txn_cancel')">
+            <div class="perm-toggle" id="t-txn_cancel"></div>
+            <div><div class="perm-name">Cancel Transaction</div><div class="perm-key">txn_cancel</div></div>
+          </div>
+
+          <div class="perm-module-header">OTC (caas)</div>
+
+          <div class="perm-item" onclick="togglePerm('trade')">
+            <div class="perm-toggle on" id="t-trade"></div>
+            <div><div class="perm-name">Execute Swap</div><div class="perm-key">trade</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('whitelist_manage')">
+            <div class="perm-toggle on" id="t-whitelist_manage"></div>
+            <div><div class="perm-name">Whitelist Manage</div><div class="perm-key">whitelist_manage</div></div>
+          </div>
+
+          <div class="perm-module-header">QFC (Quote for Client)</div>
+
+          <div class="perm-item" onclick="togglePerm('qfc_view')">
+            <div class="perm-toggle" id="t-qfc_view"></div>
+            <div><div class="perm-name">View Quotes</div><div class="perm-key">qfc_view</div></div>
+          </div>
+          <div class="perm-item" onclick="togglePerm('qfc_execute')">
+            <div class="perm-toggle" id="t-qfc_execute"></div>
+            <div><div class="perm-name">Execute Quotes</div><div class="perm-key">qfc_execute</div></div>
+          </div>
+
+          <div class="perm-module-header">Management</div>
+
+          <div class="perm-item locked" title="Granted by Transfero at partner onboarding — not self-serve">
+            <div class="perm-toggle" id="t-user_manage"></div>
+            <div><div class="perm-name">User Management</div><div class="perm-key">user_manage</div></div>
+            <span class="perm-note">Transfero-granted</span>
+          </div>
+          <div class="perm-item" onclick="togglePerm('compliance_docs')">
+            <div class="perm-toggle" id="t-compliance_docs"></div>
+            <div><div class="perm-name">Compliance Docs</div><div class="perm-key">compliance_docs_manage</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
+        <span>Presets are a starting point - every permission is individually adjustable. If you change anything, the profile is saved as a custom variant of that preset.</span>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <div style="font-size:12px;color:var(--fg-subtle)" id="footer-count">7 permissions selected</div>
+      <div class="modal-footer-right">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" id="modal-submit" onclick="saveChanges()">
+          <svg id="submit-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+          <span id="submit-label">Send Invite</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---- Data ---- */
+  const PRESETS = {
+    administrator: { label:'Administrator', desc:'Administrator preset: all permissions pre-selected.',
+      perms: new Set(['view_balance','view_history','pix_deposit','pix_withdraw','crypto_withdraw','txn_refund','txn_cancel','trade','whitelist_manage','qfc_view','qfc_execute','compliance_docs']) },
+    finance:       { label:'Finance',       desc:'Finance preset: 7 permissions pre-selected.',
+      perms: new Set(['view_balance','view_history','pix_deposit','pix_withdraw','crypto_withdraw','trade','whitelist_manage']) },
+    trader:        { label:'Trader',        desc:'Trader preset: OTC-only access (3 permissions).',
+      perms: new Set(['view_balance','view_history','trade']) },
+    support:       { label:'Support',       desc:'Support preset: history + refund/cancel (3 permissions).',
+      perms: new Set(['view_history','txn_refund','txn_cancel']) },
+    viewer:        { label:'Viewer',        desc:'Viewer preset: read-only access (2 permissions).',
+      perms: new Set(['view_balance','view_history']) }
+  };
+
+  const PROFILE_BADGE = {
+    administrator: 'pb-admin', finance:'pb-finance', trader:'pb-trader', support:'pb-support', viewer:'pb-viewer'
+  };
+  const PROFILE_LABEL = {
+    administrator:'Administrator', finance:'Finance', trader:'Trader', support:'Support', viewer:'Viewer'
+  };
+
+  const USERS = [
+    { id:0, name:'João Silva',      initials:'JS', email:'joao@xyzpay.com',   profile:'administrator',
+      avStyle:'background:var(--primary-soft);border:1px solid var(--primary-border);color:var(--primary-fg)',
+      perms: new Set(['view_balance','view_history','pix_deposit','pix_withdraw','crypto_withdraw','txn_refund','txn_cancel','trade','whitelist_manage','qfc_view','qfc_execute','compliance_docs']) },
+    { id:1, name:'Maria Santos',    initials:'MS', email:'maria@xyzpay.com',   profile:'finance',
+      avStyle:'background:var(--success-soft);border:1px solid rgba(18,183,106,0.22);color:var(--success-fg)',
+      perms: new Set(['view_balance','view_history','pix_deposit','pix_withdraw','crypto_withdraw','trade','whitelist_manage']) },
+    { id:2, name:'Carlos Oliveira', initials:'CO', email:'carlos@xyzpay.com',  profile:'trader',
+      avStyle:'background:var(--amber-soft);border:1px solid rgba(245,158,11,0.22);color:var(--amber-fg)',
+      perms: new Set(['view_balance','view_history','trade']) },
+    { id:3, name:'Ana Costa',       initials:'AC', email:'ana@xyzpay.com',     profile:'support',
+      avStyle:'background:var(--cyan-soft);border:1px solid rgba(6,182,212,0.22);color:var(--cyan-fg)',
+      perms: new Set(['view_history','txn_refund','txn_cancel']) },
+    { id:4, name:'Pedro Alves',     initials:'PA', email:'pedro@xyzpay.com',   profile:'viewer',
+      avStyle:'background:rgba(255,255,255,0.06);border:1px solid var(--border-default);color:var(--fg-muted)',
+      perms: new Set(['view_balance','view_history']) }
+  ];
+
+  const ALL_PERMS = ['view_balance','view_history','pix_deposit','pix_withdraw','crypto_withdraw','txn_refund','txn_cancel','trade','whitelist_manage','qfc_view','qfc_execute','compliance_docs'];
+
+  /* ---- State ---- */
+  let activeProfile  = 'finance';
+  let presetSnapshot = new Set(PRESETS.finance.perms);
+  let selected       = new Set(PRESETS.finance.perms);
+  let modalMode      = 'invite'; // 'invite' | 'edit'
+  let editingUserId  = null;
+
+  /* ---- Profile helpers ---- */
+  function detectProfile(permSet) {
+    for (const [key, preset] of Object.entries(PRESETS)) {
+      if (preset.perms.size === permSet.size && [...preset.perms].every(p => permSet.has(p))) return { profile: key, isCustom: false };
+    }
+    let best = 'viewer', bestScore = -1;
+    for (const [key, preset] of Object.entries(PRESETS)) {
+      const score = [...preset.perms].filter(p => permSet.has(p)).length - Math.abs(preset.perms.size - permSet.size);
+      if (score > bestScore) { bestScore = score; best = key; }
+    }
+    return { profile: best, isCustom: true };
+  }
+
+  /* ---- Core functions ---- */
+  function selectProfile(p) {
+    activeProfile  = p;
+    presetSnapshot = new Set(PRESETS[p].perms);
+    selected       = new Set(PRESETS[p].perms);
+    document.querySelectorAll('.profile-card').forEach(c => c.classList.toggle('selected', c.dataset.profile === p));
+    renderToggles();
+    renderSummary(false);
+    renderCount();
+  }
+
+  function togglePerm(key) {
+    selected.has(key) ? selected.delete(key) : selected.add(key);
+    renderToggles();
+    const isCustom = ALL_PERMS.some(k => presetSnapshot.has(k) !== selected.has(k));
+    renderSummary(isCustom);
+    renderCount();
+  }
+
+  function renderToggles() {
+    ALL_PERMS.forEach(k => { const el = document.getElementById('t-'+k); if (el) el.classList.toggle('on', selected.has(k)); });
+  }
+
+  function renderSummary(isCustom) {
+    const el = document.getElementById('preset-summary');
+    if (isCustom) {
+      el.textContent = PRESETS[activeProfile].label + ' (custom) — permissions modified from preset.';
+      el.classList.add('custom');
+    } else {
+      el.textContent = PRESETS[activeProfile].desc;
+      el.classList.remove('custom');
+    }
+  }
+
+  function renderCount() {
+    const n = selected.size;
+    document.getElementById('footer-count').textContent = n + ' permission' + (n !== 1 ? 's' : '') + ' selected';
+  }
+
+  /* ---- Modal open/close ---- */
+  function openModal() {
+    modalMode     = 'invite';
+    editingUserId = null;
+    document.getElementById('modal-title').textContent    = 'Invite Team Member';
+    document.getElementById('modal-subtitle').textContent = 'Pick a profile preset, then adjust permissions individually if needed.';
+    document.getElementById('submit-label').textContent   = 'Send Invite';
+    document.getElementById('submit-icon').innerHTML      = '<path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/>';
+    document.getElementById('invite-fields').style.display = 'grid';
+    document.getElementById('edit-user-info').style.display = 'none';
+    selectProfile('finance');
+    document.getElementById('modal-overlay').classList.add('open');
+  }
+
+  function editUser(idx) {
+    const user = USERS[idx];
+    modalMode     = 'edit';
+    editingUserId = idx;
+
+    document.getElementById('modal-title').textContent    = 'Edit Permissions';
+    document.getElementById('modal-subtitle').textContent = 'Change ' + user.name + "'s profile preset or adjust individual permissions.";
+    document.getElementById('submit-label').textContent   = 'Save Changes';
+    document.getElementById('submit-icon').innerHTML      = '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>';
+    document.getElementById('invite-fields').style.display = 'none';
+
+    /* Populate user info banner */
+    const av = document.getElementById('edit-av');
+    av.textContent = user.initials;
+    av.setAttribute('style', 'width:36px;height:36px;font-size:13px;font-weight:700;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;flex-shrink:0;' + user.avStyle);
+    document.getElementById('edit-name').textContent  = user.name;
+    document.getElementById('edit-email').textContent = user.email;
+    document.getElementById('edit-user-info').style.display = 'flex';
+
+    /* Current profile badge */
+    const { profile: matchedProfile, isCustom } = detectProfile(user.perms);
+    const badgeLabel = isCustom ? PROFILE_LABEL[matchedProfile] + ' (custom)' : PROFILE_LABEL[matchedProfile];
+    const badgeClass = isCustom ? 'pb pb-custom' : 'pb ' + PROFILE_BADGE[matchedProfile];
+    document.getElementById('edit-cur-badge').innerHTML = '<span class="' + badgeClass + '">' + badgeLabel + '</span>';
+
+    /* Load user perms into state */
+    activeProfile  = matchedProfile;
+    presetSnapshot = new Set(PRESETS[matchedProfile].perms);
+    selected       = new Set(user.perms);
+
+    document.querySelectorAll('.profile-card').forEach(c => c.classList.toggle('selected', c.dataset.profile === matchedProfile));
+    renderToggles();
+    renderSummary(isCustom);
+    renderCount();
+
+    document.getElementById('modal-overlay').classList.add('open');
+  }
+
+  function saveChanges() {
+    if (modalMode === 'invite') { closeModal(); return; }
+
+    const user = USERS[editingUserId];
+    user.perms   = new Set(selected);
+    const { profile, isCustom } = detectProfile(user.perms);
+    user.profile = profile;
+
+    const row   = document.getElementById('user-row-' + editingUserId);
+    const cells = row.querySelectorAll('td');
+
+    /* Update profile badge */
+    const badgeClass = isCustom ? 'pb pb-custom' : 'pb ' + PROFILE_BADGE[profile];
+    const badgeLabel = isCustom ? PROFILE_LABEL[profile] + ' (custom)' : PROFILE_LABEL[profile];
+    cells[1].innerHTML = '<span class="' + badgeClass + '">' + badgeLabel + '</span>';
+
+    /* Update permission count */
+    const n      = selected.size;
+    const isAll  = n === ALL_PERMS.length;
+    const strong = isAll
+      ? '<strong style="color:var(--fg-default)">All</strong>'
+      : '<strong style="color:var(--fg-default)">' + n + '</strong>';
+    cells[2].innerHTML = '<span style="font-size:12px;color:var(--fg-muted)">' + strong + ' permissions</span>';
+
+    /* Flash feedback */
+    row.classList.remove('row-saved');
+    void row.offsetWidth; /* force reflow to restart animation */
+    row.classList.add('row-saved');
+    setTimeout(() => row.classList.remove('row-saved'), 900);
+
+    closeModal();
+  }
+
+  function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+  function handleOverlayClick(e) { if (e.target.id === 'modal-overlay') closeModal(); }
+
+  /* ---- Theme toggle ---- */
+  const SUN  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>`;
+  const MOON = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+  const themeBtn = document.getElementById('theme-btn');
+  function applyTheme(t) { document.documentElement.dataset.theme = t; themeBtn.innerHTML = t==='dark' ? SUN : MOON; localStorage.setItem('uc-theme', t); }
+  applyTheme(localStorage.getItem('uc-theme') || 'dark');
+  themeBtn.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
