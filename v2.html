@@ -196,25 +196,20 @@
 
     /* Permission grid */
     .perm-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden}
-    .perm-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background var(--dur) var(--ease)}
+    .perm-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background var(--dur) var(--ease)}
     .perm-item:hover{background:rgba(255,255,255,0.03)}
     .perm-item:nth-child(odd){border-right:1px solid var(--border-subtle)}
     .perm-item:nth-last-child(1),.perm-item:nth-last-child(2){border-bottom:none}
     .perm-item.locked{opacity:0.45;cursor:not-allowed;pointer-events:none}
-    .perm-toggle{width:16px;height:16px;border-radius:4px;border:2px solid var(--border-default);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--dur) var(--ease)}
+    .perm-toggle{width:16px;height:16px;border-radius:4px;border:2px solid var(--border-default);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all var(--dur) var(--ease)}
     .perm-toggle.on{background:var(--primary-cta);border-color:var(--primary-cta)}
     .perm-toggle.on::after{content:'';width:8px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translate(1px,-1px);display:block}
     .perm-name{font-size:12px;font-weight:500;color:var(--fg-default)}
-    .perm-key{font-size:10px;color:var(--fg-subtle);font-family:var(--font-mono);margin-top:1px}
+    .perm-desc{font-size:10px;color:var(--fg-muted);line-height:1.4;margin-top:2px}
     .perm-note{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--urgent-soft);color:var(--urgent-fg);flex-shrink:0;white-space:nowrap;margin-left:auto}
     .perm-note-lock{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--fg-muted);border:1px solid var(--border-subtle);flex-shrink:0;white-space:nowrap;margin-left:auto}
     .perm-module-header{grid-column:1/-1;padding:8px 12px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-subtle);border-bottom:1px solid var(--border-subtle);background:var(--bg-base)}
 
-    /* Permission tooltips */
-    .perm-tip{position:relative;flex:1;min-width:0}
-    .perm-tip-ico{display:inline-flex;vertical-align:middle;margin-left:4px;color:var(--fg-subtle);opacity:0.5;cursor:help;transition:opacity var(--dur) var(--ease)}
-    .perm-tip:hover .perm-tip-ico{opacity:1}
-    #global-tooltip{position:fixed;z-index:9999;background:var(--bg-elevated);border:1px solid var(--border-default);color:var(--fg-default);font-size:11px;line-height:1.5;padding:8px 11px;border-radius:var(--r-lg);width:220px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.55);white-space:normal;opacity:0;transition:opacity .15s ease;display:none}
 
     /* QFC notice in modal */
     .qfc-notice{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--violet-soft);border-top:1px solid var(--border-subtle)}
@@ -532,29 +527,29 @@
           <div class="perm-module-header">Payments (baas)</div>
           <div class="perm-item" onclick="togglePerm('view_balance')">
             <div class="perm-toggle" id="t-view_balance"></div>
-            <div class="perm-tip" data-tip="See the account's available balance across all currencies."><div class="perm-name">View Balance <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">view_balance</div></div>
+            <div><div class="perm-name">View Balance</div><div class="perm-desc">See the available balance across all currencies.</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('view_history')">
             <div class="perm-toggle" id="t-view_history"></div>
-            <div class="perm-tip" data-tip="Browse past transactions, statements and export reports."><div class="perm-name">Transaction History <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">view_history</div></div>
+            <div><div class="perm-name">Transaction History</div><div class="perm-desc">Browse past transactions and export statements.</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('pix_deposit')">
             <div class="perm-toggle" id="t-pix_deposit"></div>
-            <div class="perm-tip" data-tip="Receive payments via PIX, TED, boleto or crypto deposit into the account."><div class="perm-name">PayIn (PIX / Crypto) <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">pix_deposit</div></div>
+            <div><div class="perm-name">PayIn (PIX / Crypto)</div><div class="perm-desc">Receive via PIX, TED, boleto or crypto deposit.</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('pix_withdraw')">
             <div class="perm-toggle" id="t-pix_withdraw"></div>
-            <div class="perm-tip" data-tip="Send payments out via PIX, TED or crypto to external destinations."><div class="perm-name">PayOut (PIX / Crypto) <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">pix_withdraw</div></div>
+            <div><div class="perm-name">PayOut (PIX / Crypto)</div><div class="perm-desc">Send payments via PIX, TED or crypto.</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('crypto_withdraw')">
             <div class="perm-toggle" id="t-crypto_withdraw"></div>
-            <div class="perm-tip" data-tip="Transfer crypto assets to external wallet addresses."><div class="perm-name">Crypto Withdraw <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">crypto_withdraw</div></div>
+            <div><div class="perm-name">Crypto Withdraw</div><div class="perm-desc">Transfer crypto to external wallet addresses.</div></div>
           </div>
 
           <div class="perm-module-header">OTC (caas)</div>
           <div class="perm-item" onclick="togglePerm('trade')">
             <div class="perm-toggle" id="t-trade"></div>
-            <div class="perm-tip" data-tip="Execute OTC swap operations converting crypto to FIAT or vice versa at a live quote."><div class="perm-name">Execute Swap <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">trade</div></div>
+            <div><div class="perm-name">Execute Swap</div><div class="perm-desc">Convert crypto to FIAT or vice versa at a live quote.</div></div>
           </div>
 
         </div>
@@ -732,40 +727,6 @@
 
   selectProfile('finance');
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  // Global fixed tooltip — escapes any overflow:hidden container
-  (function(){
-    const el = document.createElement('div');
-    el.id = 'global-tooltip';
-    document.body.appendChild(el);
-
-    document.addEventListener('mouseover', function(e){
-      const target = e.target.closest('[data-tip]');
-      if (!target) return;
-      const text = target.getAttribute('data-tip');
-      if (!text) return;
-      const rect = target.getBoundingClientRect();
-      el.textContent = text;
-      el.style.display = 'block';
-      // position above; flip below if too close to top
-      const gap = 8;
-      const estH = 70;
-      let top = rect.top - estH - gap;
-      if (top < 8) top = rect.bottom + gap;
-      let left = rect.left;
-      if (left + 220 > window.innerWidth - 8) left = window.innerWidth - 228;
-      el.style.top = top + 'px';
-      el.style.left = left + 'px';
-      requestAnimationFrame(() => { el.style.opacity = '1'; });
-    });
-
-    document.addEventListener('mouseout', function(e){
-      const target = e.target.closest('[data-tip]');
-      if (!target) return;
-      el.style.opacity = '0';
-      setTimeout(() => { if (el.style.opacity === '0') el.style.display = 'none'; }, 150);
-    });
-  })();
 </script>
 </body>
 </html>
