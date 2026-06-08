@@ -211,10 +211,10 @@
     .perm-module-header{grid-column:1/-1;padding:8px 12px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-subtle);border-bottom:1px solid var(--border-subtle);background:var(--bg-base)}
 
     /* Permission tooltips */
-    .perm-tip{flex:1;min-width:0}
+    .perm-tip{position:relative;flex:1;min-width:0}
     .perm-tip-ico{display:inline-flex;vertical-align:middle;margin-left:4px;color:var(--fg-subtle);opacity:0.5;cursor:help;transition:opacity var(--dur) var(--ease)}
     .perm-tip:hover .perm-tip-ico{opacity:1}
-    #perm-tooltip{position:fixed;background:var(--bg-elevated);border:1px solid var(--border-default);color:var(--fg-default);font-size:11px;line-height:1.5;font-weight:400;padding:8px 11px;border-radius:var(--r-lg);width:220px;pointer-events:none;opacity:0;transition:opacity var(--dur) var(--ease);z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.45);white-space:normal;top:0;left:0}
+    #global-tooltip{position:fixed;z-index:9999;background:var(--bg-elevated);border:1px solid var(--border-default);color:var(--fg-default);font-size:11px;line-height:1.5;padding:8px 11px;border-radius:var(--r-lg);width:220px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.55);white-space:normal;opacity:0;transition:opacity .15s ease;display:none}
 
     /* QFC notice in modal */
     .qfc-notice{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--violet-soft);border-top:1px solid var(--border-subtle)}
@@ -733,30 +733,39 @@
   selectProfile('finance');
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  // Permission tooltips
-  const permTooltip = document.getElementById('perm-tooltip');
-  document.querySelectorAll('.perm-tip[data-tip]').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      permTooltip.textContent = el.getAttribute('data-tip');
-      permTooltip.style.opacity = '0';
-      permTooltip.style.top = '0px';
-      permTooltip.style.left = '0px';
-      requestAnimationFrame(() => {
-        const r = el.getBoundingClientRect();
-        const th = permTooltip.offsetHeight;
-        const tw = 220;
-        let top = r.top - th - 8;
-        let left = r.left;
-        if (top < 8) top = r.bottom + 8;
-        if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
-        permTooltip.style.top = top + 'px';
-        permTooltip.style.left = left + 'px';
-        permTooltip.style.opacity = '1';
-      });
+  // Global fixed tooltip — escapes any overflow:hidden container
+  (function(){
+    const el = document.createElement('div');
+    el.id = 'global-tooltip';
+    document.body.appendChild(el);
+
+    document.addEventListener('mouseover', function(e){
+      const target = e.target.closest('[data-tip]');
+      if (!target) return;
+      const text = target.getAttribute('data-tip');
+      if (!text) return;
+      const rect = target.getBoundingClientRect();
+      el.textContent = text;
+      el.style.display = 'block';
+      // position above; flip below if too close to top
+      const gap = 8;
+      const estH = 70;
+      let top = rect.top - estH - gap;
+      if (top < 8) top = rect.bottom + gap;
+      let left = rect.left;
+      if (left + 220 > window.innerWidth - 8) left = window.innerWidth - 228;
+      el.style.top = top + 'px';
+      el.style.left = left + 'px';
+      requestAnimationFrame(() => { el.style.opacity = '1'; });
     });
-    el.addEventListener('mouseleave', () => { permTooltip.style.opacity = '0'; });
-  });
+
+    document.addEventListener('mouseout', function(e){
+      const target = e.target.closest('[data-tip]');
+      if (!target) return;
+      el.style.opacity = '0';
+      setTimeout(() => { if (el.style.opacity === '0') el.style.display = 'none'; }, 150);
+    });
+  })();
 </script>
-<div id="perm-tooltip"></div>
 </body>
 </html>
