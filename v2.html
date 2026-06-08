@@ -210,6 +210,13 @@
     .perm-note-lock{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--fg-muted);border:1px solid var(--border-subtle);flex-shrink:0;white-space:nowrap;margin-left:auto}
     .perm-module-header{grid-column:1/-1;padding:8px 12px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-subtle);border-bottom:1px solid var(--border-subtle);background:var(--bg-base)}
 
+    /* Permission tooltips */
+    .perm-tip{position:relative;flex:1;min-width:0}
+    .perm-tip-ico{display:inline-flex;vertical-align:middle;margin-left:4px;color:var(--fg-subtle);opacity:0.5;cursor:help;transition:opacity var(--dur) var(--ease)}
+    .perm-tip:hover .perm-tip-ico{opacity:1}
+    .perm-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:0;background:var(--bg-elevated);border:1px solid var(--border-default);color:var(--fg-default);font-size:11px;line-height:1.5;font-weight:400;padding:8px 11px;border-radius:var(--r-lg);width:220px;pointer-events:none;opacity:0;transition:opacity var(--dur) var(--ease);z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.45);white-space:normal}
+    .perm-tip:hover::after{opacity:1}
+
     /* QFC notice in modal */
     .qfc-notice{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--violet-soft);border-top:1px solid var(--border-subtle)}
     .qfc-notice-text{font-size:11px;color:var(--violet-fg);line-height:1.5}
@@ -526,29 +533,29 @@
           <div class="perm-module-header">Payments (baas)</div>
           <div class="perm-item" onclick="togglePerm('view_balance')">
             <div class="perm-toggle" id="t-view_balance"></div>
-            <div><div class="perm-name">View Balance</div><div class="perm-key">view_balance</div></div>
+            <div class="perm-tip" data-tip="See the account's available balance across all currencies."><div class="perm-name">View Balance <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">view_balance</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('view_history')">
             <div class="perm-toggle" id="t-view_history"></div>
-            <div><div class="perm-name">Transaction History</div><div class="perm-key">view_history</div></div>
+            <div class="perm-tip" data-tip="Browse past transactions, statements and export reports."><div class="perm-name">Transaction History <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">view_history</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('pix_deposit')">
             <div class="perm-toggle" id="t-pix_deposit"></div>
-            <div><div class="perm-name">PayIn (PIX / Crypto)</div><div class="perm-key">pix_deposit</div></div>
+            <div class="perm-tip" data-tip="Receive payments via PIX, TED, boleto or crypto deposit into the account."><div class="perm-name">PayIn (PIX / Crypto) <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">pix_deposit</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('pix_withdraw')">
             <div class="perm-toggle" id="t-pix_withdraw"></div>
-            <div><div class="perm-name">PayOut (PIX / Crypto)</div><div class="perm-key">pix_withdraw</div></div>
+            <div class="perm-tip" data-tip="Send payments out via PIX, TED or crypto to external destinations."><div class="perm-name">PayOut (PIX / Crypto) <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">pix_withdraw</div></div>
           </div>
           <div class="perm-item" onclick="togglePerm('crypto_withdraw')">
             <div class="perm-toggle" id="t-crypto_withdraw"></div>
-            <div><div class="perm-name">Crypto Withdraw</div><div class="perm-key">crypto_withdraw</div></div>
+            <div class="perm-tip" data-tip="Transfer crypto assets to external wallet addresses."><div class="perm-name">Crypto Withdraw <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">crypto_withdraw</div></div>
           </div>
 
           <div class="perm-module-header">OTC (caas)</div>
           <div class="perm-item" onclick="togglePerm('trade')">
             <div class="perm-toggle" id="t-trade"></div>
-            <div><div class="perm-name">Execute Swap</div><div class="perm-key">trade</div></div>
+            <div class="perm-tip" data-tip="Execute OTC swap operations converting crypto to FIAT or vice versa at a live quote."><div class="perm-name">Execute Swap <svg class="perm-tip-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg></div><div class="perm-key">trade</div></div>
           </div>
 
         </div>
